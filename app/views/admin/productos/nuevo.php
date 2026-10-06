@@ -14,21 +14,21 @@
                 <input type="text" class="form-control" name="codigo" id="codigo"  maxlength="50" required>
             </div>
             <div class="col-md-4 form-group">
-                <label for="nombre" >Nombre :</label>
-                <input type="text" class="form-control" name="nombre" id="nombre"  maxlength="150" required>
+                <label for="nombre">Nombre :</label>
+                <input type="text" name="nombre" id="nombre" class="form-control" maxlength="150" required>
             </div>
             <div class="col-md-4 form-group">
-                <label for="descripcion" >Descripción :</label>
-                <textarea class="form-control" name="descripcion" id="descripcion" required></textarea>
-            </div>
-            <div> class="col-md-4 form-group">
-                <label for="precio" >Precio :</label>
-                <input type="decimal" class="form-control" name="precio" id="precio" required>
+                <label for="descripcion">Descripción :</label>
+                <textarea name="descripcion" id="descripcion" class="form-control" maxlength="500" required></textarea>
             </div>
             <div class="col-md-4 form-group">
-                <label for="stock" >Stock :</label>
-                <input type="number" class="form-control" name="stock" id="stock" maxlength="11" required>
-        </div>
+                <label for="precio">Precio :</label>
+                <input type="number" name="precio" id="precio" class="form-control" step="0.01" required>
+            </div>
+            <div class="col-md-4 form-group">
+                <label for="stock">Stock :</label>
+                <input type="number" name="stock" id="stock" class="form-control" step="1" min="0" required>
+            </div>
     </form> 
 
 </div>

@@ -15,7 +15,10 @@ class ProductosController extends Controller
         exit;
     }
     public function nuevo(){
+        // Estas categorias se utilizan para llenar el selct del formulario 
         $categorias = ['Electrónica', 'Ropa', 'Hogar'];
+
+        //Envia a la vista los datos necesarios para renderizar el formulario.
         $this->view('admin/productos/nuevo', [
             'isAdmin'   => true,
             'module'    => 'admin',
