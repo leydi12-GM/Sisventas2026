@@ -2,7 +2,6 @@
 namespace App\Controllers\Admin;
 
 include_once __DIR__ . '/../../models/Admin/Usuarios.php';
-// Incluye otros modelos si necesitas relaciones, por ejemplo Ventas si un usuario (vendedor) tiene ventas asignadas
 
 use Core\Controller;
 use App\Models\Admin\Usuarios;
@@ -12,6 +11,7 @@ class UsuariosController extends Controller
     protected $usuariosModel; 
 
     public function __construct(){
+        parent::__construct(); // esto es para heredar el constructor de la clase padre Controller
         $this->usuariosModel = new Usuarios();
     }
 
@@ -29,8 +29,11 @@ class UsuariosController extends Controller
     }
 
     public function nuevo(){
+        $roles = $this->usuariosModel->obtenerRoles();
+        
         $this->view('admin/usuarios/nuevo', [
             'isAdmin'   => true,
+            'roles'     => $roles,
             'module'    => 'admin',
             'pageTitle' => 'Nuevo Usuario'
         ]);
@@ -40,8 +43,8 @@ class UsuariosController extends Controller
     public function guardar(){
        $data = $_POST; 
        
-       // Validar los datos recibidos
-       if(!empty($data['nombre']) && !empty($data['correo']) && !empty($data['password']) && !empty($data['rol'])){
+       // Validar los datos obligatorios recibidos
+       if(!empty($data['nombre']) && !empty($data['apellidos']) && !empty($data['correo']) && !empty($data['password']) && !empty($data['rol'])){
         
         // Encriptar la contraseña por seguridad antes de enviarla al modelo
         $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
@@ -57,20 +60,21 @@ class UsuariosController extends Controller
         }
 
        }else {
-            $_SESSION['flash_error'] = "Todos los campos son obligatorios.";
+            $_SESSION['flash_error'] = "Todos los campos obligatorios deben ser completados (Nombres, Apellidos, Correo, Contraseña, Rol).";
             header('Location: ' . BASE_URL . '/admin/usuarios/nuevo');
        }
     }
 
     public function editar($id){
-        // Buscar un usuario por id
         $usuario = $this->usuariosModel->ver($id);
+        $roles = $this->usuariosModel->obtenerRoles();
         
         $this->view('admin/usuarios/editar', [
             'isAdmin'   => true,
             'module'    => 'admin',
             'pageTitle' => 'Editar Usuario',
-            'usuario'  => $usuario
+            'usuario'   => $usuario,
+            'roles'     => $roles
         ]);
         exit;
     }
@@ -79,7 +83,7 @@ class UsuariosController extends Controller
         $data = $_POST;
         
         // La contraseña puede venir vacía (significa que no la quieren cambiar)
-        if(!empty($data['nombre']) && !empty($data['correo']) && !empty($data['rol']) && isset($data['estado'])){
+        if(!empty($data['nombre']) && !empty($data['apellidos']) && !empty($data['correo']) && !empty($data['rol']) && isset($data['estado'])){
             
             // Si el usuario ingresó una nueva contraseña, la encriptamos. Si no, se manda vacía y el modelo lo gestiona.
             if(!empty($data['password'])){
@@ -89,56 +93,65 @@ class UsuariosController extends Controller
             $respuesta = $this->usuariosModel->actualizar($data);
             
             if($respuesta){
-                $_SESSION['flash_success'] = "Usuario actualizado correctamente";
+                $_SESSION['flash_success'] = "Usuario actualizado correctamente.";
                 header('Location: ' . BASE_URL . '/admin/usuarios');
             }else{
-                $_SESSION['flash_error'] = "Error al actualizar el usuario";
+                $_SESSION['flash_error'] = "Error al actualizar el usuario.";
                 
                 // Redirección con los datos devueltos para no perder lo que escribieron
                 $datos_usuario = [
-                    'id'     => $data['id'],
-                    'nombre' => $data['nombre'],
-                    'correo' => $data['correo'],
-                    'rol'    => $data['rol'],
-                    'activo' => $data['estado']
+                    'id'        => $data['id'],
+                    'nombre'    => $data['nombre'],
+                    'apellidos' => $data['apellidos'],
+                    'telefono'  => $data['telefono'] ?? '',
+                    'correo'    => $data['correo'],
+                    'rol'       => $data['rol'],
+                    'activo'    => $data['estado']
                 ];
                 
+                $roles = $this->usuariosModel->obtenerRoles();
+
                 $this->view('admin/usuarios/editar', [
                     'isAdmin'   => true,
                     'module'    => 'admin',
                     'pageTitle' => 'Editar Usuario',
-                    'usuario'   => $datos_usuario
+                    'usuario'   => $datos_usuario,
+                    'roles'     => $roles
                 ]);
             }
         }else{
-            $_SESSION['flash_error'] ="Error: Campos vacíos obligatorios (Nombre, Correo, Rol, Estado)";
+            $_SESSION['flash_error'] = "Error: Campos obligatorios vacíos (Nombres, Apellidos, Correo, Rol, Estado).";
             
             $datos_usuario = [
-                'id'     => $data['id'],
-                'nombre' => $data['nombre'],
-                'correo' => $data['correo'],
-                'rol'    => $data['rol'],
-                'activo' => $data['estado']
+                'id'        => $data['id'] ?? '',
+                'nombre'    => $data['nombre'] ?? '',
+                'apellidos' => $data['apellidos'] ?? '',
+                'telefono'  => $data['telefono'] ?? '',
+                'correo'    => $data['correo'] ?? '',
+                'rol'       => $data['rol'] ?? '',
+                'activo'    => $data['estado'] ?? 1
             ];
             
+            $roles = $this->usuariosModel->obtenerRoles();
+
             $this->view('admin/usuarios/editar', [
                 'isAdmin'   => true,
                 'module'    => 'admin',
                 'pageTitle' => 'Editar Usuario',
-                'usuario'   => $datos_usuario
+                'usuario'   => $datos_usuario,
+                'roles'     => $roles
             ]);
         }
     }
 
     public function eliminar($id){
         try {
-            // Intentamos eliminar el usuario
             $eliminar = $this->usuariosModel->eliminar($id);
             
             if($eliminar){
-                $_SESSION['flash_success'] = "Usuario eliminado correctamente";
+                $_SESSION['flash_success'] = "Usuario eliminado correctamente.";
             }else{
-                $_SESSION['flash_error'] = "Error al eliminar el usuario";
+                $_SESSION['flash_error'] = "Error al eliminar el usuario.";
             }
             
         } catch (\PDOException $e) {
@@ -152,7 +165,6 @@ class UsuariosController extends Controller
             }
         }
 
-        // Redireccionamos de vuelta a la lista de usuarios
         header('Location: ' . BASE_URL . '/admin/usuarios');
         exit;
     }

@@ -3,9 +3,17 @@
     <h3>Registrar Nuevo Usuario</h3>
     <form action="<?= BASE_URL ?>/admin/usuarios/guardar" method="post">
         <div class="row">
-            <div class="col-md-4 form-group">
-                <label for="nombre">Nombre y Apellidos :</label>
-                <input type="text" name="nombre" id="nombre" class="form-control" maxlength="150" required>
+            <div class="col-md-3 form-group">
+                <label for="nombre">Nombres :</label>
+                <input type="text" name="nombre" id="nombre" class="form-control" maxlength="40" required>
+            </div>
+            <div class="col-md-3 form-group">
+                <label for="apellidos">Apellidos :</label>
+                <input type="text" name="apellidos" id="apellidos" class="form-control" maxlength="80" required>
+            </div>
+            <div class="col-md-3 form-group">
+                <label for="telefono">Teléfono :</label>
+                <input type="text" name="telefono" id="telefono" class="form-control" maxlength="20">
             </div>
             <div class="col-md-3 form-group">
                 <label for="correo">Correo Electrónico :</label>
@@ -20,12 +28,18 @@
                     </button>
                 </div>
             </div>
-            <div class="col-md-2 form-group">
+            <div class="col-md-3 form-group">
                 <label for="rol">Rol :</label>
                 <select name="rol" id="rol" class="form-control" required>
                     <option value="">Seleccione...</option>
-                    <option value="1">Administrador</option>
-                    <option value="2">Vendedor</option>
+                    <?php if(!empty($roles)): ?>
+                        <?php foreach($roles as $r): ?>
+                            <option value="<?= $r['id'] ?>"><?= htmlspecialchars($r['nombre']) ?></option>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <option value="1">Administrador</option>
+                        <option value="2">Vendedor</option>
+                    <?php endif; ?>
                 </select>
             </div>
         </div>

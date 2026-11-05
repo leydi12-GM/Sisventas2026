@@ -18,7 +18,7 @@
         <tbody>
             <?php 
             $contador = 0;
-            foreach ($productos as $producto) {
+            foreach ($productos as $producto) { 
                 $contador +=1;
             ?>
             <tr>

@@ -7,8 +7,10 @@
         <thead>
             <tr>
                 <th>Nro</th>
-                <th>Nombre</th>
+                <th>Nombres</th>
+                <th>Apellidos</th>
                 <th>Correo</th>
+                <th>Teléfono</th>
                 <th>Rol</th>
                 <th>Estado</th>
                 <th>Acciones</th>
@@ -17,19 +19,17 @@
         <tbody>
             <?php 
             $contador = 0;
-            foreach ($usuarios as $usuario) {
-                $contador +=1;
+            foreach ($usuarios as $usuario) { 
+                $contador += 1;
+                $rolDisplay = $usuario['rol_nombre'] ?? ($usuario['rol'] == 1 ? 'Administrador' : ($usuario['rol'] == 2 ? 'Vendedor' : 'Rol ' . $usuario['rol']));
             ?>
             <tr>
                 <td><?php echo $contador; ?></td>
                 <td><?php echo htmlspecialchars($usuario['nombre']); ?></td>
+                <td><?php echo htmlspecialchars($usuario['apellidos'] ?? ''); ?></td>
                 <td><?php echo htmlspecialchars($usuario['correo']); ?></td>
-                <td>
-                    <?php 
-                        // Asumiendo que 1 es Administrador en tu base de datos
-                        echo ($usuario['rol'] == 1) ? 'Administrador' : 'Vendedor'; 
-                    ?>
-                </td>
+                <td><?php echo !empty($usuario['telefono']) ? htmlspecialchars($usuario['telefono']) : '-'; ?></td>
+                <td><?php echo htmlspecialchars($rolDisplay); ?></td>
                 <td>
                     <?php if($usuario['activo'] == 1): ?>
                         <span class="badge bg-success text-white">Activo</span>
